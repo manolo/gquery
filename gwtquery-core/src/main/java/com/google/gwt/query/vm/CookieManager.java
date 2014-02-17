@@ -43,10 +43,12 @@ public class CookieManager {
   }
   
   public void removeDomainCookies(String domain) {
+    domain = getDomainFromHost(domain);
     store.remove(domain);
   }
   
   public void removeDomainCookie(String domain, String... cookies) {
+    domain = getDomainFromHost(domain);
     Map<String, Map<String, String>> domainStore =  store.get(domain);
     if (domainStore != null) {
       for (String cookie: cookies) {

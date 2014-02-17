@@ -59,6 +59,8 @@
                         <module>gwtquery.samples.ColorEffects</module>
                         <module>gwtquery.samples.HomePageSample</module>
                     </modules>
+                    <runTarget>index.html</runTarget>
+
                 </configuration>
                 <executions>
                     <execution>

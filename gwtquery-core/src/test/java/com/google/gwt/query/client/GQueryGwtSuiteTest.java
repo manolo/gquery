@@ -16,22 +16,23 @@ import com.google.gwt.query.client.impl.SelectorEnginesTestGwt;
  */
 public class GQueryGwtSuiteTest extends GWTTestSuite {
   public static Test suite() {
+    System.setProperty("gwt.usearchives","false");
       GWTTestSuite suite = new GWTTestSuite( "GQuery Suite" );
-      suite.addTestSuite(AjaxTestJre.class);
-      suite.addTestSuite(DataBindingTestJre.class);
+//      suite.addTestSuite(AjaxTestJre.class);
+//      suite.addTestSuite(DataBindingTestJre.class);
       suite.addTestSuite(DataBindingTestGwt.class);
-      suite.addTestSuite(GQueryAjaxTestGwt.class);
-      suite.addTestSuite(AjaxTestGwt.class);
-      suite.addTestSuite(GQueryDeferredTestGwt.class);
-      suite.addTestSuite(DeferredTestGwt.class);
-      suite.addTestSuite(GQuerySelectorsTestGwt.class);
-      suite.addTestSuite(GQueryCoreTestGwt.class);
-      suite.addTestSuite(GQueryCssTestGwt.class);
-      suite.addTestSuite(GQueryEventsTestGwt.class);
-      suite.addTestSuite(GQueryEffectsTestGwt.class);
-      suite.addTestSuite(GQueryJsTestGwt.class);
-      suite.addTestSuite(GQueryWidgetsTestGwt.class);
-      suite.addTestSuite(SelectorEnginesTestGwt.class);
+//      suite.addTestSuite(GQueryAjaxTestGwt.class);
+//      suite.addTestSuite(AjaxTestGwt.class);
+//      suite.addTestSuite(GQueryDeferredTestGwt.class);
+//      suite.addTestSuite(DeferredTestGwt.class);
+//      suite.addTestSuite(GQuerySelectorsTestGwt.class);
+//      suite.addTestSuite(GQueryCoreTestGwt.class);
+//      suite.addTestSuite(GQueryCssTestGwt.class);
+//      suite.addTestSuite(GQueryEventsTestGwt.class);
+//      suite.addTestSuite(GQueryEffectsTestGwt.class);
+//      suite.addTestSuite(GQueryJsTestGwt.class);
+//      suite.addTestSuite(GQueryWidgetsTestGwt.class);
+//      suite.addTestSuite(SelectorEnginesTestGwt.class);
       return suite;
   }
 }
