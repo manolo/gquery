@@ -46,6 +46,7 @@
                 <runTarget>test/test.html</runTarget>
                 <hostedWebapp>target/www</hostedWebapp>
                 <compileReport>true</compileReport>
+                <gen>target/gen</gen>
             </configuration>
             <executions>
                 <execution>

@@ -3219,6 +3219,7 @@ public class GQuery implements Lazy<GQuery, LazyGQuery> {
    * Attach an event handler function for one or more events to the selected elements.
    */
   public GQuery on(String eventName, Function... funcs) {
+    console.log("ON " + eventName + " " + get(0).hashCode());
     return bind(eventName, funcs);
   }
 
