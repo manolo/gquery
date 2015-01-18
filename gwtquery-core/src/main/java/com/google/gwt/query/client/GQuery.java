@@ -72,7 +72,7 @@ import java.util.List;
 /**
  * GwtQuery is a GWT clone of the popular jQuery library.
  */
-public class GQuery implements Lazy<GQuery, LazyGQuery> {
+public class GQuery extends com.google.gwt.query.client.$ implements Lazy<GQuery, LazyGQuery>{
 
   private enum DomMan {
     AFTER, APPEND, BEFORE, PREPEND;
@@ -227,7 +227,7 @@ public class GQuery implements Lazy<GQuery, LazyGQuery> {
         return (GQuery) o;
       }
       if (o instanceof Function) {
-        return $(((Function) o).getElement());
+        return new GQuery(((Function) o).getElement());
       }
       if (o instanceof IsWidget) {
         return $(Arrays.asList(o));
@@ -266,6 +266,11 @@ public class GQuery implements Lazy<GQuery, LazyGQuery> {
           .log("Error: GQuery.$(Object o) could not wrap the type : ", o.getClass().getName(), o);
     }
     return $();
+  }
+
+  // FIXME: compiler java8 complains if we remove this
+  public static GQuery $(Element e) {
+    return new GQuery(e);
   }
 
   /**
@@ -697,35 +702,6 @@ public class GQuery implements Lazy<GQuery, LazyGQuery> {
       plugins.put(plugin, pluginFactory);
     }
     return plugin;
-  }
-
-  /**
-   * Provides a way to execute callback Functions based on one or more objects
-   * that represent asynchronous events.
-   *
-   * Arguments can be of any Object, but normally you would pass Promises.
-   * In the case you provide a GQuery object it will call the promise() method to return
-   * a Promise which will be executed when the queue is resolved.
-   * In the case you provide a normal Object, it will return a promise which will be immediately
-   * resolved with the object as argument.
-   * In the case you provide a Function it will executed and if the f(Object...) method returns
-   * a new promise it will be used, otherwise we will use the returned object like in the last case.
-   *
-   * It Returns a new promise which will be finalized when all of its subordinates finish.
-   * In the case of all subordinates are resolved correctly the promise will be resolved
-   * otherwise it will be rejected.
-   */
-  public static Promise when(Object... subordinates) {
-    return Deferred.when(subordinates);
-  }
-
-  /**
-   * A constructor function that returns a chainable utility object with methods to register
-   * multiple callbacks into callback queues, invoke callback queues, and relay the success
-   * or failure state of any synchronous or asynchronous function.
-   */
-  public static Promise.Deferred Deferred() {
-    return new Deferred();
   }
 
   public static SelectorEngine getSelectorEngine() {
@@ -1972,7 +1948,7 @@ public class GQuery implements Lazy<GQuery, LazyGQuery> {
    * Remove all event handlers previously attached using {@link #live(String, Function)}. In order
    * for this method to function correctly, the selector used with it must match exactly the
    * selector initially used with {@link #live(String, Function)}.
-   * 
+   *
    * @deprecated use {@link #off(String, String)} instead
    */
   public GQuery die() {
@@ -4540,7 +4516,7 @@ public class GQuery implements Lazy<GQuery, LazyGQuery> {
   /**
    * Remove all event delegation that have been bound using
    * {@link #delegate(String, int, Function...)} {@link #live(int, Function...)} methods.
-   * 
+   *
    * @deprecated use {@link #off()}
    */
   public GQuery undelegate() {
@@ -4550,7 +4526,7 @@ public class GQuery implements Lazy<GQuery, LazyGQuery> {
   /**
    * Undelegate is a way of removing event handlers that have been bound using
    * {@link #delegate(String, int, Function...)} method.
-   * 
+   *
    * @deprecated use {@link #off(String)}
    */
   public GQuery undelegate(String selector) {
@@ -4564,7 +4540,7 @@ public class GQuery implements Lazy<GQuery, LazyGQuery> {
   /**
    * Undelegate is a way of removing event handlers that have been bound using
    * {@link #delegate(String, int, Function...)} method.
-   * 
+   *
    * @deprecated use {@link #off(String)}
    */
   public GQuery undelegate(String selector, int eventBit) {
@@ -4578,7 +4554,7 @@ public class GQuery implements Lazy<GQuery, LazyGQuery> {
   /**
    * Undelegate is a way of removing event handlers that have been bound using
    * {@link #delegate(String, int, Function...)} method.
-   * 
+   *
    * @deprecated use {@link #off(String, String)}
    */
   public GQuery undelegate(String selector, String eventName) {
