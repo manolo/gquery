@@ -14,44 +14,37 @@
 package com.google.gwt.query.client;
 
 import com.google.gwt.query.client.GqFunctions.IsReturnFunction;
-import com.google.gwt.query.client.GqFunctions.IsReturnFunction1;
-import com.google.gwt.query.client.functions.Action1;
 
 /**
  * Definition of jquery Promise interface used in gquery.
  */
-public interface Promise<T> extends IsReturnFunction {
+public interface Promise extends IsReturnFunction {
 
   /**
    * Definition of jquery Deferred interface used in gquery.
    */
-  public interface Deferred<T> {
+  public interface Deferred {
     /**
      * Call the progressCallbacks on a Deferred object with the given args.
      */
-    Deferred<T> notify(Object... o);
-
+    Deferred notify(Object... o);
     /**
      * Return a Deferred’s Promise object.
      */
-    Promise<T> promise();
-
+    Promise promise();
     /**
      * Reject a Deferred object and call any failCallbacks with the given args.
      */
-    Deferred<T> reject(Object... o);
-
+    Deferred reject(Object... o);
     /**
      * Resolve a Deferred object and call any doneCallbacks with the given args.
      */
-    Deferred<T> resolve(T... o);
-
-    Deferred<T> onResolve(T o);
+    Deferred resolve(Object... o);
   }
 
-  public static final String PENDING = "pending";
-  public static final String REJECTED = "rejected";
-  public static final String RESOLVED = "resolved";
+  String PENDING = "pending";
+  String REJECTED = "rejected";
+  String RESOLVED = "resolved";
 
   /**
    * Add handlers to be called when the Deferred object is either resolved or rejected.
@@ -63,8 +56,6 @@ public interface Promise<T> extends IsReturnFunction {
    */
   Promise done(Function... o);
 
-  Promise<T> done(Action1<T> doneAction);
-
   /**
    * Add handlers to be called when the Deferred object is rejected.
    */
@@ -72,7 +63,11 @@ public interface Promise<T> extends IsReturnFunction {
 
   /**
    * Utility method to filter and/or chain Deferreds.
+<<<<<<< HEAD
    *
+=======
+   * 
+>>>>>>> parent of 4ccec94... TypeSafe Promises
    * @deprecated use 'then' instead.
    *   it was deprecated in jquery, and we maintain it here for compatibility.
    */
@@ -111,7 +106,7 @@ public interface Promise<T> extends IsReturnFunction {
    * Add filters to be called just in case the Deferred object is rejected returning
    * a new valid promise so as we can continue the flow control of the chain.
    *
-   * It works in the same way than adding a second parameter to {@link #then} method but
+   * It works in the same way than adding a second parameter to {@link then} method but
    * continuing the flow and making more readable the code.
    *
    * Example:
@@ -128,7 +123,7 @@ public interface Promise<T> extends IsReturnFunction {
   /**
    * Add filters to be called just in case the Deferred object is resolved.
    *
-   * It works in the same way than {@link #then} does but making more readable
+   * It works in the same way than {@link then} does but making more readable
    * the code flow.
    *
    * NOTE: this method is in gQuery but not in jQuery.

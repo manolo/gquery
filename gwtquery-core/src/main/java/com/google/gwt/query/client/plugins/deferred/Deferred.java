@@ -15,25 +15,27 @@
  */
 package com.google.gwt.query.client.plugins.deferred;
 
+import static com.google.gwt.query.client.Promise.PENDING;
+import static com.google.gwt.query.client.Promise.REJECTED;
+import static com.google.gwt.query.client.Promise.RESOLVED;
+
 import com.google.gwt.query.client.Function;
 import com.google.gwt.query.client.GQuery;
 import com.google.gwt.query.client.Promise;
-import com.google.gwt.query.client.functions.*;
 
 import static com.google.gwt.query.client.GQuery.console;
 import static com.google.gwt.query.client.Promise.*;
-import static com.google.gwt.query.client.functions.Functions.*;
 
 /**
  * Implementation of jQuery.Deferred for gwtquery.
  */
-public class Deferred<T> implements Promise.Deferred<T> {
+public class Deferred implements Promise.Deferred {
 
   /**
    * Implementation of the Promise interface which is used internally by
    * Deferred.
    */
-  public static class DeferredPromiseImpl<T> implements Promise<T> {
+  public static class DeferredPromiseImpl implements Promise {
     // Using 'int' instead of 'enum' because we use them as indexes as well
     private static final int DONE = 0, FAIL = 1, PROGRESS = 2;
 
@@ -49,7 +51,8 @@ public class Deferred<T> implements Promise.Deferred<T> {
       // Whether break the flow if old deferred fails
       boolean cont = false;
 
-      public ThenFunction(Deferred newDfd, Function[] subordinates, int funcType, boolean continueFlow) {
+      public ThenFunction(Deferred newDfd, Function[] subordinates, int funcType,
+          boolean continueFlow) {
         type = funcType;
         filter = subordinates.length > type ? subordinates[type] : null;
         dfd = newDfd;
@@ -66,18 +69,23 @@ public class Deferred<T> implements Promise.Deferred<T> {
             // If filter function returns a promise we pipeline it.
             final Promise p = (Promise) newArgs;
             if (type == PROGRESS) {
-              p.progress(new Function(){public void f() {
-                settle(PROGRESS, getArguments());
-              }});
+              p.progress(new Function() {
+                public void f() {
+                  settle(PROGRESS, getArguments());
+                }
+              });
             } else {
-              p.always(new Function(){public void f() {
-                settle((type == DONE || type == FAIL && cont) && p.isResolved() ? DONE : FAIL, getArguments());
-              }});
+              p.always(new Function() {
+                public void f() {
+                  settle((type == DONE || type == FAIL && cont) && p.isResolved() ? DONE : FAIL,
+                      getArguments());
+                }
+              });
             }
           } else {
             // Otherwise we change the arguments by the new ones
             newArgs = Boolean.TRUE.equals(newArgs) ? oldArgs :
-                      newArgs != null && newArgs.getClass().isArray() ? (Object[])newArgs : newArgs;
+                newArgs != null && newArgs.getClass().isArray() ? (Object[]) newArgs : newArgs;
             settle(type, newArgs);
           }
         } else {
@@ -87,9 +95,12 @@ public class Deferred<T> implements Promise.Deferred<T> {
       }
 
       private void settle(int action, Object... args) {
-        if (action == DONE) dfd.resolve(args);
-        if (action == FAIL) dfd.reject(args);
-        if (action == PROGRESS) dfd.notify(args);
+        if (action == DONE)
+          dfd.resolve(args);
+        if (action == FAIL)
+          dfd.reject(args);
+        if (action == PROGRESS)
+          dfd.notify(args);
       }
     }
 
@@ -155,12 +166,6 @@ public class Deferred<T> implements Promise.Deferred<T> {
       return this;
     }
 
-    @Override
-    public Promise<T> done(final Action1<T> doneAction) {
-      dfd.resolve.add(fromFuncN(fromAction(doneAction)));
-      return this;
-    }
-
     public Promise fail(Function... f) {
       dfd.reject.add(f);
       return this;
@@ -219,25 +224,22 @@ public class Deferred<T> implements Promise.Deferred<T> {
   /**
    * Internal Deferred class used to combine a set of subordinate promises.
    */
-  private static class WhenDeferredImpl<T> extends Deferred<T> {
-
+  private static class WhenDeferredImpl extends Deferred {
     /**
      * Internal function used to track whether all deferred subordinates are
      * resolved.
      */
     private class DoneFnc extends Function {
       final int idx;
-      private final FuncN<T> doneFunc;
 
-      public DoneFnc(int i, Deferred d, FuncN<T> doneFunc) {
+      public DoneFnc(int i, Deferred d) {
         idx = i;
-        this.doneFunc = doneFunc;
       }
 
       public Object f(Object... args) {
         values[idx] = args.length == 1 ? args[0] : args;
         if (--remaining == 0) {
-          WhenDeferredImpl.this.resolve(doneFunc.call(values));
+          WhenDeferredImpl.this.resolve(values);
         }
         return true;
       }
@@ -263,11 +265,11 @@ public class Deferred<T> implements Promise.Deferred<T> {
     // An indexed array with the fired values of all subordinated
     private final Object[] values;
 
-    public WhenDeferredImpl(Promise[] sub, FuncN<T> doneFunc) {
+    public WhenDeferredImpl(Promise[] sub) {
       int l = remaining = sub.length;
       values = new Object[l];
       for (int i = 0; i < l; i++) {
-        sub[i].done(new DoneFnc(i, this, doneFunc)).progress(progressFnc).fail(failFnc);
+        sub[i].done(new DoneFnc(i, this)).progress(progressFnc).fail(failFnc);
       }
     }
   }
@@ -281,64 +283,46 @@ public class Deferred<T> implements Promise.Deferred<T> {
    * Deferred as soon as all the Deferreds resolve, or reject the master Deferred as
    * soon as one of the Deferreds is rejected
    */
-  public static <T> Promise<T> when(Object... d) {
-    console.log(d.length);
+  public static Promise when(Object... d) {
     int l = d.length;
-    Promise<T>[] p = new Promise[l];
+    Promise[] p = new Promise[l];
     for (int i = 0; i < l; i++) {
       p[i] = makePromise(d[i]);
     }
     return when(p);
   }
 
-  private static <T> Promise<T> makePromise(final Object o) {
+  private static Promise makePromise(final Object o) {
     if (o instanceof Promise) {
-      return (Promise<T>)o;
+      return (Promise) o;
     } else if (o instanceof Function) {
-      return makePromise(((Function)o).f(new Object[0]));
+      return makePromise(((Function) o).f(new Object[0]));
     } else if (o instanceof GQuery) {
-      return ((GQuery)o).promise();
+      return ((GQuery) o).promise();
     } else {
-      return new PromiseFunction<T>() {
-        public void f(Deferred<T> dfd) {
-          dfd.resolve((T)o);
+      return new PromiseFunction() {
+        public void f(Deferred dfd) {
+          dfd.resolve(o);
         }
       };
     }
   }
 
-  public static <T> Promise<T> when(Promise<T>... d) {
+  public static Promise when(Promise... d) {
     final int n = d.length;
     switch (n) {
       case 1:
-        return when(d[0]);
+        return d[0];
       case 0:
-        return (Promise<T>)when();
+        return new Deferred().resolve().promise();
       default:
-        return (Promise<T>)new WhenDeferredImpl<Object[]>(d, new FuncN<Object[]>() {
-          @Override
-          public Object[] call(Object... args) {
-            return args;
-          }
-        }).promise();
+        return new WhenDeferredImpl(d).promise();
     }
-  }
-
-  public static <T> Promise<T> when(Promise<T> p) {
-    return p;
-  }
-
-  private static Promise<Void> when() {
-    return new Deferred<Void>().resolve().promise();
-  }
-
-  public static <T1, T2, R> Promise<R> when(Promise<? extends T1> p1, Promise<? extends T2> p2, Func2<T1, T2, R> doneFunction) {
-    return new WhenDeferredImpl<R>(new Promise[]{p1,p2}, fromFunc(doneFunction)).promise();
   }
 
   private Callbacks notify = new Callbacks("memory");
 
-  private Promise<T> promise = null;
+  private Promise promise = null;
 
   private Callbacks reject = new Callbacks("once memory");
 
@@ -367,17 +351,18 @@ public class Deferred<T> implements Promise.Deferred<T> {
   /**
    * Call the progressCallbacks on a Deferred object with the given args.
    */
-  public Deferred<T> notify(Object... o) {
-    if (state.equals(PENDING)) notify.fire(o);
+  public Deferred notify(Object... o) {
+    if (state == PENDING)
+      notify.fire(o);
     return this;
   }
 
   /**
    * Return a Deferred’s Promise object.
    */
-  public Promise<T> promise() {
+  public Promise promise() {
     if (promise == null) {
-      promise = new DeferredPromiseImpl<T>(this);
+      promise = new DeferredPromiseImpl(this);
     }
     return promise;
   }
@@ -385,27 +370,24 @@ public class Deferred<T> implements Promise.Deferred<T> {
   /**
    * Reject a Deferred object and call any failCallbacks with the given args.
    */
-  public Deferred<T> reject(Object... o) {
-    if (state.equals(PENDING)) reject.fire(o);
+  public Deferred reject(Object... o) {
+    if (state == PENDING)
+      reject.fire(o);
     return this;
   }
 
   /**
    * Resolve a Deferred object and call any doneCallbacks with the given args.
    */
-  @Override
-  public Deferred<T> resolve(Object... o) {
-    if (state.equals(PENDING)) resolve.fire(o);
+  public Deferred resolve(Object... o) {
+    if (state == PENDING)
+      resolve.fire(o);
     return this;
   }
 
   @Override
-  public Deferred<T> onResolve(T o) {
-    return resolve(o);
-  }
-
-  @Override
   public String toString() {
-    return "Deferred this=" + hashCode() + " promise=" + promise().hashCode() + " state=" + promise.state() + " restatus=" + resolve.status();
+    return "Deferred this=" + hashCode() + " promise=" + promise().hashCode() + " state="
+        + promise.state() + " restatus=" + resolve.status();
   }
 }
