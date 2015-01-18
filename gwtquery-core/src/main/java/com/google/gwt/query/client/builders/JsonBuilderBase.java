@@ -15,8 +15,11 @@
  */
 package com.google.gwt.query.client.builders;
 
+import static com.google.gwt.query.client.GQuery.console;
+
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.query.client.GQuery;
 import com.google.gwt.query.client.IsProperties;
 import com.google.gwt.query.client.Properties;
 import com.google.gwt.query.client.js.JsCache;
@@ -65,11 +68,13 @@ public abstract class JsonBuilderBase<J extends JsonBuilderBase<?>> implements J
   @SuppressWarnings("unchecked")
   @Override
   public J load(Object prp) {
-    assert prp == null || prp instanceof JavaScriptObject || prp instanceof String;
-    if (prp != null && prp instanceof String) {
-      return parse((String) prp);
-    }
+    assert prp == null || prp instanceof JavaScriptObject || prp instanceof String || prp instanceof GQuery;
     if (prp != null) {
+      if (prp instanceof String) {
+        parse((String) prp);
+      } else if (prp instanceof GQuery) {
+        prp = ((GQuery)prp).get(0);
+      };
       p = (Properties) prp;
     }
     return (J) this;

@@ -14,6 +14,9 @@
 package com.google.gwt.query.client;
 
 import com.google.gwt.query.client.GqFunctions.IsReturnFunction;
+import com.google.gwt.query.client.GqFunctions.IsReturnFunction1;
+import com.google.gwt.query.client.GqFunctions.IsVoidFunction1;
+import com.google.gwt.query.client.GqFunctions.IsVoidFunction2;
 
 /**
  * Definition of jquery Promise interface used in gquery.
@@ -49,35 +52,36 @@ public interface Promise extends IsReturnFunction {
   /**
    * Add handlers to be called when the Deferred object is either resolved or rejected.
    */
-  Promise always(Function... o);
+  Promise always(IsVoidFunction1<?> o);
 
   /**
    * Add handlers to be called when the Deferred object is resolved.
    */
-  Promise done(Function... o);
+  Promise done(IsVoidFunction1<?> o);
+
+// FIXME: not supported by GWT yet
+//  default Promise done(IsVoidFunction o) {
+//    return done((IsVoidFunction1<?>)o);
+//  }
 
   /**
    * Add handlers to be called when the Deferred object is rejected.
    */
-  Promise fail(Function... o);
+  Promise fail(IsVoidFunction1<?> o);
 
   /**
    * Utility method to filter and/or chain Deferreds.
-<<<<<<< HEAD
-   *
-=======
-   * 
->>>>>>> parent of 4ccec94... TypeSafe Promises
    * @deprecated use 'then' instead.
    *   it was deprecated in jquery, and we maintain it here for compatibility.
    */
   @Deprecated
-  Promise pipe(Function... f);
+  Promise pipe(IsReturnFunction1 f);
 
   /**
    * Utility method to filter and/or chain Deferreds.
    */
-  Promise progress(Function... o);
+  Promise progress(IsVoidFunction1<?> o);
+  Promise progress(IsVoidFunction2<?, ?> o);
 
   /**
    * Return the status of the deferred object.
@@ -100,7 +104,10 @@ public interface Promise extends IsReturnFunction {
    *   2nd function that is called when the deferred is rejected.
    *   3rd one will be called when progress notifications are sent.
    */
-  Promise then(Function... f);
+  Promise then(IsReturnFunction1 resolvedF);
+  Promise then(Function f1);
+  Promise then(Function f1, Function f2);
+  Promise then(Function f1, Function f2, Function f3);
 
   /**
    * Add filters to be called just in case the Deferred object is rejected returning
@@ -118,7 +125,7 @@ public interface Promise extends IsReturnFunction {
    *
    * NOTE: this is a convenience method in gQuery not present in jQuery.
    */
-  Promise or(Function f);
+  Promise or(IsReturnFunction1 f);
 
   /**
    * Add filters to be called just in case the Deferred object is resolved.
@@ -137,7 +144,7 @@ public interface Promise extends IsReturnFunction {
    *
    * NOTE: this is a convenience method in gQuery not present in jQuery.
    */
-  Promise and(Function f);
+  Promise and(IsReturnFunction1 f);
 
   /**
    * Determine whether a Deferred object has been resolved.

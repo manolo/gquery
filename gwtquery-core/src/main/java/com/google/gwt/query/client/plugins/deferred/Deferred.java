@@ -19,12 +19,13 @@ import static com.google.gwt.query.client.Promise.PENDING;
 import static com.google.gwt.query.client.Promise.REJECTED;
 import static com.google.gwt.query.client.Promise.RESOLVED;
 
+import com.google.gwt.query.client.$;
 import com.google.gwt.query.client.Function;
 import com.google.gwt.query.client.GQuery;
+import com.google.gwt.query.client.GqFunctions.IsReturnFunction1;
+import com.google.gwt.query.client.GqFunctions.IsVoidFunction1;
+import com.google.gwt.query.client.GqFunctions.IsVoidFunction2;
 import com.google.gwt.query.client.Promise;
-
-import static com.google.gwt.query.client.GQuery.console;
-import static com.google.gwt.query.client.Promise.*;
 
 /**
  * Implementation of jQuery.Deferred for gwtquery.
@@ -153,36 +154,43 @@ public class Deferred implements Promise.Deferred {
       dfd = o;
     }
 
-    public Promise always(Function... f) {
+    public Promise always(IsVoidFunction1<?> f) {
       return done(f).fail(f);
     }
 
-    public Promise and(Function f) {
-      return then(f);
+    public Promise and(IsReturnFunction1 f) {
+      return then(false, $.toFnc(f));
     }
 
-    public Promise done(Function... f) {
+    public Promise done(IsVoidFunction1<?> f) {
       dfd.resolve.add(f);
       return this;
     }
 
-    public Promise fail(Function... f) {
+    public Promise fail(IsVoidFunction1<?> f) {
       dfd.reject.add(f);
       return this;
     }
 
-    public Promise or(final Function f) {
-      return then(true, null, f);
+    public Promise or(IsReturnFunction1 f) {
+      return then(true, null, $.toFnc(f));
     }
 
-    public Promise pipe(Function... f) {
+    public Promise pipe(IsReturnFunction1 f) {
       return then(f);
     }
 
-    public Promise progress(Function... f) {
+    public Promise progress(IsVoidFunction1<?> f) {
       dfd.notify.add(f);
       return this;
     }
+
+    @Override
+    public Promise progress(IsVoidFunction2<?, ?> f) {
+      dfd.notify.add((IsVoidFunction2)f);
+      return null;
+    }
+
 
     public String state() {
       return dfd.state;
@@ -194,10 +202,6 @@ public class Deferred implements Promise.Deferred {
       fail(new ThenFunction(newDfd, f, FAIL, continueFlow));
       progress(new ThenFunction(newDfd, f, PROGRESS, continueFlow));
       return newDfd.promise();
-    }
-
-    public Promise then(final Function... f) {
-      return then(false, f);
     }
 
     public boolean isResolved() {
@@ -218,6 +222,56 @@ public class Deferred implements Promise.Deferred {
 
     public Object call() {
       return this;
+    }
+
+    @Override
+    public Promise then(IsReturnFunction1 f) {
+      return then(false, $.toFnc(f));
+    }
+
+    @Override
+    public Promise then(Function f1) {
+      return then(false, new Function[]{f1});
+    }
+
+    @Override
+    public Promise then(Function f1, Function f2) {
+      return then(false, new Function[]{f1, f2});
+    }
+
+    @Override
+    public Promise then(Function f1, Function f2, Function f3) {
+      return then(false, new Function[]{f1, f2, f3});
+    }
+
+    @Override
+    public Object call(Object t) {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    @Override
+    public Object call(Object t, Object u) {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    @Override
+    public Object call(Object t, Object u, Object v) {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    @Override
+    public Object call(Object t, Object u, Object v, Object w) {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    @Override
+    public Object call(Object t, Object u, Object v, Object w, Object x) {
+      // TODO Auto-generated method stub
+      return null;
     }
   }
 

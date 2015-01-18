@@ -18,6 +18,9 @@ package com.google.gwt.query.client;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.query.client.GqFunctions.IsReturnFunction;
+import com.google.gwt.query.client.GqFunctions.IsReturnFunction1;
+import com.google.gwt.query.client.GqFunctions.IsVoidFunction;
+import com.google.gwt.query.client.GqFunctions.IsVoidFunction1;
 import com.google.gwt.query.client.js.JsUtils;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.Widget;
@@ -25,7 +28,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * Extend this class to implement functions callbacks.
  */
-public abstract class Function implements IsReturnFunction {
+public abstract class Function implements IsReturnFunction, IsVoidFunction {
 
   private com.google.gwt.dom.client.Element element = null;
   private Event event = null;
@@ -53,8 +56,21 @@ public abstract class Function implements IsReturnFunction {
     return dumpArguments(arguments, "\n");
   }
 
+  @Override
   public Object call() {
     return f(new Object[]{});
+  }
+  @Override
+  public final Object call(Object t) {
+    return f(new Object[]{t});
+  }
+  @Override
+  public void run() {
+    f();
+  }
+  @Override
+  public final void run(Object t) {
+    f(new Object[]{});
   }
 
   private String dumpArguments(Object[] arguments, String sep) {

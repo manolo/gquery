@@ -24,7 +24,6 @@ import com.google.gwt.core.client.Duration;
 import com.google.gwt.junit.client.GWTTestCase;
 import com.google.gwt.query.client.plugins.ajax.Ajax;
 import com.google.gwt.query.client.plugins.deferred.PromiseFunction;
-import com.google.gwt.query.client.plugins.effects.Fx;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.HTML;
@@ -311,25 +310,17 @@ public class GQueryDeferredTestGwt extends GWTTestCase {
 
   public void testWhenArgumentsWhithAnyObject() {
     $(e).html("<div>a1</div><div>a2</div>");
-
     final GQuery g = $("div", e);
     assertEquals(2, g.length());
-
     // We can pass to when any object.
-//    GQuery.when(g, g.delay(100).delay(100), "Foo", $$("{bar: 'foo'}"))
-//          .done(new Function(){public void f() {
-//              GQuery g1 = arguments(1, 0);
-//              GQuery g2 = arguments(1, 0);
-//              String foo = arguments(2, 0);
-//              Properties p = arguments(3, 0);
-//
-//              // We dont compare g and g1/g2 because they are different
-//              // objects (GQuery vs QueuePlugin) but we can compare its content
-//              assertEquals(g.toString(), g1.toString());
-//              assertEquals(g.toString(), g2.toString());
-//
-//              assertEquals("Foo", foo);
-//              assertEquals("foo", p.get("bar"));
-//          }});
+    GQuery.when(() -> g, () -> g.delay(100).delay(100), () -> "Foo", () -> $$("{bar: 'foo'}"))
+          .done((Object[] args) -> {
+              // We dont compare g and g1/g2 because they are different
+              // objects (GQuery vs QueuePlugin) but we can compare its content
+              assertEquals(g.toString(), args[0].toString());
+              assertEquals(g.toString(), args[1].toString());
+              assertEquals("Foo", args[2]);
+              assertEquals("foo", ((Properties)(args[3])).get("bar"));
+          });
   }
 }

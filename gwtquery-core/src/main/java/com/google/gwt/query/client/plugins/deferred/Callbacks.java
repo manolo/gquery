@@ -13,11 +13,14 @@
  */
 package com.google.gwt.query.client.plugins.deferred;
 
-import com.google.gwt.query.client.Function;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import com.google.gwt.query.client.$;
+import com.google.gwt.query.client.Function;
+import com.google.gwt.query.client.GqFunctions.IsVoidFunction1;
+import com.google.gwt.query.client.GqFunctions.IsVoidFunction2;
 
 /**
  * Implementation of jQuery.Callbacks for gwtquery.
@@ -49,9 +52,9 @@ public class Callbacks {
 
   /**
    * Create a new Callbacks object with options given as a space delimited string.
-   * 
+   *
    * Valid options are:
-   * 
+   *
    * once, memory, unique, stopOnFalse
    */
   public Callbacks(String options) {
@@ -63,7 +66,7 @@ public class Callbacks {
 
   /**
    * Add a Callback or a collection of callbacks to a callback list.
-   * 
+   *
    */
   public Callbacks add(Callback... c) {
     addAll((Object[]) c);
@@ -83,6 +86,19 @@ public class Callbacks {
    */
   public Callbacks add(Function... f) {
     addAll((Object[]) f);
+    return this;
+  }
+
+  /**
+   * Add a Function or a collection of Function to a callback list.
+   */
+  public Callbacks add(IsVoidFunction1<?> f) {
+    addAll($.toFnc(f));
+    return this;
+  }
+
+  public Callbacks add(IsVoidFunction2<?, ?> f) {
+    addAll($.toFnc(f));
     return this;
   }
 
@@ -154,6 +170,8 @@ public class Callbacks {
     }
     if (c instanceof Callback) {
       return ((Callback) c).f(o);
+    } else if (c instanceof IsVoidFunction1 && !(c instanceof Function)) {
+      ((IsVoidFunction1)c).run(o);
     } else if (c instanceof Function) {
       Object r = ((Function) c).f(o);
       return (r instanceof Boolean) ? (Boolean) r : true;

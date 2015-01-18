@@ -13,76 +13,106 @@ import com.google.gwt.query.client.GqFunctions.IsEventFunction;
 import com.google.gwt.query.client.GqFunctions.IsEventFunctionVoid;
 import com.google.gwt.query.client.GqFunctions.IsReturnFunction;
 import com.google.gwt.query.client.GqFunctions.IsReturnFunction1;
+import com.google.gwt.query.client.GqFunctions.IsVoidFunction;
+import com.google.gwt.query.client.GqFunctions.IsVoidFunction1;
+import com.google.gwt.query.client.GqFunctions.IsVoidFunction2;
 import com.google.gwt.query.client.plugins.deferred.Deferred;
 import com.google.gwt.user.client.Event;
 
 public abstract class $ implements IsReturnFunction {
-  
+
   public static GQuery $(Object o) {
     return GQuery.$(o);
   }
-  
-  private static <T, R> Function[] toFnc(IsReturnFunction1<T, R>...fncs) {
+
+  public static <T, R> Function[] toFnc(IsReturnFunction1<T, R>...fncs) {
     Function[] ret = new Function[fncs.length];
     for (int i = 0; i < fncs.length; i++) {
       ret[i] = toFnc(fncs[i]);
     }
     return ret;
   }
-  private static <T, R> Function[] toFnc(Object...fncs) {
+  public static <T, R> Function[] toFnc(Object...fncs) {
     Function[] ret = new Function[fncs.length];
     for (int i = 0; i < fncs.length; i++) {
-      if (fncs[i] instanceof IsReturnFunction) {
+      if (fncs[i] instanceof IsVoidFunction) {
+        ret[i] = toFnc((IsVoidFunction)fncs[i]);
+      } else if (fncs[i] instanceof IsReturnFunction) {
         ret[i] = toFnc((IsReturnFunction)fncs[i]);
       } else if (fncs[i] instanceof IsReturnFunction1) {
         ret[i] = toFnc((IsReturnFunction1)fncs[i]);
+      } else {
+        console.log("Unknown class type: " + fncs[i]);
       }
     }
     return ret;
   }
-  private static Function toFnc(IsReturnFunction1<?, ?> fnc) {
+  public static Function toFnc(IsReturnFunction1 fnc) {
     return new Function() {
       public Object f(Object... args) {
-        return fnc.call(arguments(0));
+        return fnc.call(args[0]);
       }
     };
   }
-  private static Function toFnc(IsReturnFunction fnc) {
+  public static Function toFnc(IsVoidFunction fnc) {
+    return fnc instanceof Function ? (Function) fnc : new Function() {
+      public  void f() {
+        fnc.run();
+      };
+    };
+  }
+  public static Function toFnc(IsVoidFunction1 fnc) {
+    return fnc instanceof Function ? (Function) fnc : new Function() {
+      public  Object f(Object[] args) {
+        fnc.run(arguments(0));
+        return null;
+      };
+    };
+  }
+  public static Function toFnc(IsVoidFunction2 fnc) {
+    return fnc instanceof Function ? (Function) fnc : new Function() {
+      public  Object f(Object[] args) {
+        fnc.run(arguments(0), arguments(1));
+        return null;
+      };
+    };
+  }
+  public static Function toFnc(IsReturnFunction fnc) {
     return fnc instanceof Function ? (Function) fnc : new Function() {
       public  Object f(Object[] args) {
         return fnc.call();
       };
     };
   }
-  private static Function toFnc(IsEventFunction fnc) {
+  public static Function toFnc(IsEventFunction fnc) {
     return new Function() {
       public boolean f(Event e) {
         return fnc.call(e);
       }
     };
   }
-  private static Function toFnc(IsEventDataFunction<?> fnc) {
+  public static Function toFnc(IsEventDataFunction<Object> fnc) {
     return new Function() {
       public boolean f(Event e, Object... arg) {
         return fnc.call(e, arguments(0));
       }
     };
   }
-  private static Function toFnc(IsEventDataFunction2<?, ?> fnc) {
+  public static Function toFnc(IsEventDataFunction2<Object, Object> fnc) {
     return new Function() {
       public boolean f(Event e, Object... arg) {
         return fnc.call(e, arguments(0), arguments(1));
       }
     };
   }
-  private static Function toFnc(IsEventDataFunction3<?, ?, ?> fnc) {
+  public static Function toFnc(IsEventDataFunction3<Object, Object, Object> fnc) {
     return new Function() {
       public boolean f(Event e, Object... arg) {
         return fnc.call(e, arguments(0), arguments(1), arguments(2));
       }
     };
   }
-  private static Function toFnc(IsEventDataFunction4<?, ?, ?, ?> fnc) {
+  public static Function toFnc(IsEventDataFunction4<Object, Object, Object, Object> fnc) {
     return new Function() {
       public boolean f(Event e, Object... arg) {
         return fnc.call(e, arguments(0), arguments(1), arguments(2), arguments(3));
@@ -92,22 +122,22 @@ public abstract class $ implements IsReturnFunction {
   private Function toFnc(IsEventFunctionVoid fnc) {
     return new Function() {
       public boolean f(Event e) {
-        fnc.call(e);
+        fnc.run(e);
         return true;
       }
     };
   }
-  private static Function toFnc(IsElementFunction fnc) {
+  public static Function toFnc(IsElementFunction fnc) {
     return new Function() {
       public void f(Element e) {
-        fnc.call(e);
+        fnc.run(e);
       }
     };
   }
-  private Function toFnc(IsElementIndexFunction fnc) {
+  public static Function toFnc(IsElementIndexFunction fnc) {
     return new Function() {
       public Object f(Element e, int i) {
-        fnc.call(i, e);
+        fnc.run(i, e);
         return null;
       }
     };
@@ -135,25 +165,32 @@ public abstract class $ implements IsReturnFunction {
     return asGq().on(name, selector, data, toFnc(fnc));
   }
   public <T>GQuery on(String name, String selector, T data, IsEventDataFunction<T> fnc) {
-    return asGq().on(name, selector, data, toFnc(fnc));
+    return asGq().on(name, selector, data, toFnc((IsEventDataFunction)fnc));
   }
   public <T, U>GQuery on(String name, String selector, T data, IsEventDataFunction2<T, U> fnc) {
-    return asGq().on(name, selector, data, toFnc(fnc));
+    return asGq().on(name, selector, data, toFnc((IsEventDataFunction2)fnc));
   }
   public <T, U, V>GQuery on(String name, String selector, T data, IsEventDataFunction3<T, U, V> fnc) {
-    return asGq().on(name, selector, data, toFnc(fnc));
+    return asGq().on(name, selector, data, toFnc((IsEventDataFunction3)fnc));
   }
   public <T, U, V, W>GQuery on(String name, String selector, T data, IsEventDataFunction4<T, U, V, W> fnc) {
-    return asGq().on(name, selector, data, toFnc(fnc));
+    return asGq().on(name, selector, data, toFnc((IsEventDataFunction4)fnc));
   }
-  
+
+  public GQuery each(IsVoidFunction fnc) {
+    return asGq().each(new Function[]{toFnc(fnc)});
+  }
   public GQuery each(IsElementFunction fnc) {
-    return asGq().each(toFnc(fnc));
+    return asGq().each(new Function[]{toFnc(fnc)});
   }
   public GQuery each(IsElementIndexFunction fnc) {
-    return asGq().each(toFnc(fnc));
+    return asGq().each(new Function[]{toFnc(fnc)});
   }
-  
+
+  public GQuery ready(IsVoidFunction fnc) {
+    return asGq().each(fnc);
+  }
+
   /**
    * Provides a way to execute callback Functions based on one or more objects
    * that represent asynchronous events.
@@ -191,6 +228,9 @@ public abstract class $ implements IsReturnFunction {
   public static Promise when(IsReturnFunction a, IsReturnFunction b, IsReturnFunction c) {
     return Deferred.when(toFnc(a), toFnc(b), toFnc(c));
   }
+  public static Promise when(IsReturnFunction a, IsReturnFunction b, IsReturnFunction c, IsReturnFunction d) {
+    return Deferred.when(toFnc(a), toFnc(b), toFnc(c), toFnc(d));
+  }
 
 
   /**
@@ -201,8 +241,18 @@ public abstract class $ implements IsReturnFunction {
   public static Promise.Deferred Deferred() {
     return new Deferred();
   }
-  
+
   public Object call() {
     return asGq().promise();
+  }
+
+  public boolean True() {
+    return true;
+  }
+  public boolean False() {
+    return false;
+  }
+  public boolean Null() {
+    return false;
   }
 }

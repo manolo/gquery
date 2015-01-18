@@ -3741,7 +3741,7 @@ public class GQuery extends com.google.gwt.query.client.$ implements Lazy<GQuery
    * This guarantees that our gwt code will be executed either it's executed synchronously before the
    * DOM has been rendered (ie: single script linker in header) or asynchronously.
    */
-  public Promise ready(Function... fncs) {
+  public Promise ready(Function fnc) {
     return new PromiseFunction() {
       public void f(final com.google.gwt.query.client.Promise.Deferred dfd) {
         if ("complete" == $(document).prop("readyState")) {
@@ -3754,7 +3754,7 @@ public class GQuery extends com.google.gwt.query.client.$ implements Lazy<GQuery
           });
         }
       }
-    }.done(fncs);
+    }.done(fnc);
   }
 
   /**
