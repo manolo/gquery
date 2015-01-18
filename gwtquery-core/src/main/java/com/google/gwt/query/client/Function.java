@@ -17,6 +17,7 @@ package com.google.gwt.query.client;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.query.client.GqFunctions.IsReturnFunction;
 import com.google.gwt.query.client.js.JsUtils;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.Widget;
@@ -24,7 +25,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * Extend this class to implement functions callbacks.
  */
-public abstract class Function {
+public abstract class Function implements IsReturnFunction {
 
   private com.google.gwt.dom.client.Element element = null;
   private Event event = null;
@@ -50,6 +51,10 @@ public abstract class Function {
    */
   protected String dumpArguments() {
     return dumpArguments(arguments, "\n");
+  }
+
+  public Object call() {
+    return f(new Object[]{});
   }
 
   private String dumpArguments(Object[] arguments, String sep) {
@@ -538,6 +543,7 @@ public abstract class Function {
    * They are intentionally final to avoid override them.
    */
   public final boolean fe(Event ev, Object... args) {
+    setArguments(args);
     if (GWT.getUncaughtExceptionHandler() != null) {
       try {
         return f(ev, args);

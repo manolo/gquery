@@ -20,6 +20,7 @@ import com.google.gwt.query.client.GQuery;
 import com.google.gwt.query.client.Promise;
 import com.google.gwt.query.client.functions.*;
 
+import static com.google.gwt.query.client.GQuery.console;
 import static com.google.gwt.query.client.Promise.*;
 import static com.google.gwt.query.client.functions.Functions.*;
 
@@ -209,6 +210,10 @@ public class Deferred<T> implements Promise.Deferred<T> {
     public String toString() {
       return "Promise this=" + hashCode() + " " + dfd;
     }
+
+    public Object call() {
+      return this;
+    }
   }
 
   /**
@@ -276,40 +281,41 @@ public class Deferred<T> implements Promise.Deferred<T> {
    * Deferred as soon as all the Deferreds resolve, or reject the master Deferred as
    * soon as one of the Deferreds is rejected
    */
-  public static Promise<?> when(Object... d) {
+  public static <T> Promise<T> when(Object... d) {
+    console.log(d.length);
     int l = d.length;
-    Promise[] p = new Promise[l];
+    Promise<T>[] p = new Promise[l];
     for (int i = 0; i < l; i++) {
       p[i] = makePromise(d[i]);
     }
     return when(p);
   }
 
-  private static Promise<?> makePromise(final Object o) {
+  private static <T> Promise<T> makePromise(final Object o) {
     if (o instanceof Promise) {
-      return (Promise)o;
+      return (Promise<T>)o;
     } else if (o instanceof Function) {
       return makePromise(((Function)o).f(new Object[0]));
     } else if (o instanceof GQuery) {
       return ((GQuery)o).promise();
     } else {
-      return new PromiseFunction() {
-        public void f(Deferred dfd) {
-          dfd.resolve(o);
+      return new PromiseFunction<T>() {
+        public void f(Deferred<T> dfd) {
+          dfd.resolve((T)o);
         }
       };
     }
   }
 
-  public static Promise<?> when(Promise... d) {
+  public static <T> Promise<T> when(Promise<T>... d) {
     final int n = d.length;
     switch (n) {
       case 1:
         return when(d[0]);
       case 0:
-        return when();
+        return (Promise<T>)when();
       default:
-        return new WhenDeferredImpl<Object[]>(d, new FuncN<Object[]>() {
+        return (Promise<T>)new WhenDeferredImpl<Object[]>(d, new FuncN<Object[]>() {
           @Override
           public Object[] call(Object... args) {
             return args;

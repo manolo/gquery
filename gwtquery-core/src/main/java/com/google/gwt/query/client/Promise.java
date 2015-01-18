@@ -13,36 +13,38 @@
  */
 package com.google.gwt.query.client;
 
+import com.google.gwt.query.client.GqFunctions.IsReturnFunction;
+import com.google.gwt.query.client.GqFunctions.IsReturnFunction1;
 import com.google.gwt.query.client.functions.Action1;
 
 /**
- * Definition of jquery Promise interface used in gquery. 
+ * Definition of jquery Promise interface used in gquery.
  */
-public interface Promise<T> {
-  
+public interface Promise<T> extends IsReturnFunction {
+
   /**
-   * Definition of jquery Deferred interface used in gquery. 
+   * Definition of jquery Deferred interface used in gquery.
    */
   public interface Deferred<T> {
     /**
      * Call the progressCallbacks on a Deferred object with the given args.
      */
     Deferred<T> notify(Object... o);
-    
+
     /**
      * Return a Deferred’s Promise object.
      */
     Promise<T> promise();
-    
+
     /**
      * Reject a Deferred object and call any failCallbacks with the given args.
      */
     Deferred<T> reject(Object... o);
-    
+
     /**
      * Resolve a Deferred object and call any doneCallbacks with the given args.
      */
-    Deferred<T> resolve(Object... o);
+    Deferred<T> resolve(T... o);
 
     Deferred<T> onResolve(T o);
   }
@@ -70,8 +72,8 @@ public interface Promise<T> {
 
   /**
    * Utility method to filter and/or chain Deferreds.
-   * 
-   * @deprecated use 'then' instead. 
+   *
+   * @deprecated use 'then' instead.
    *   it was deprecated in jquery, and we maintain it here for compatibility.
    */
   @Deprecated
@@ -84,9 +86,9 @@ public interface Promise<T> {
 
   /**
    * Return the status of the deferred object.
-   * 
+   *
    * Valid values are: Promise.PENDING, Promise.REJECTED, Promise.RESOLVED
-   * 
+   *
    */
   String state();
 
@@ -101,7 +103,7 @@ public interface Promise<T> {
    * @param f a list of 1, 2, or 3 functions, which will be used in this way:
    *   1st function will be called when the deferred is resolved.
    *   2nd function that is called when the deferred is rejected.
-   *   3rd one will be called when progress notifications are sent.  
+   *   3rd one will be called when progress notifications are sent.
    */
   Promise then(Function... f);
 
@@ -146,7 +148,7 @@ public interface Promise<T> {
    * Determine whether a Deferred object has been resolved.
    */
   boolean isResolved();
-  
+
   /**
    * Determine whether a Deferred object has been rejected.
    */
