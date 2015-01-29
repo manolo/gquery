@@ -229,10 +229,10 @@ public class GQuery extends com.google.gwt.query.client.$ implements Lazy<GQuery
         return (GQuery) o;
       }
       if (o instanceof Function) {
-        return $((Function) o);
+        return new GQuery(((Function) o).getElement());
       }
       if (JsUtils.isElement(o)) {
-        return $(JsUtils.<Element> cast(o));
+        return new GQuery(JsUtils.<Element> cast(o));
       }
       if (o instanceof JsonBuilder) {
         return new GQuery(((JsonBuilder) o).<Element>getDataImpl());
