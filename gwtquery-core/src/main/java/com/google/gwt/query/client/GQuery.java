@@ -33,10 +33,12 @@ import com.google.gwt.dom.client.OptionElement;
 import com.google.gwt.dom.client.SelectElement;
 import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.dom.client.TextAreaElement;
+import com.google.gwt.query.client.builders.JsonBuilder;
 import com.google.gwt.query.client.css.HasCssValue;
 import com.google.gwt.query.client.css.TakesCssValue;
 import com.google.gwt.query.client.css.TakesCssValue.CssSetter;
 import com.google.gwt.query.client.impl.AttributeImpl;
+import com.google.gwt.query.client.impl.ConsoleBrowser;
 import com.google.gwt.query.client.impl.DocumentStyleImpl;
 import com.google.gwt.query.client.impl.SelectorEngine;
 import com.google.gwt.query.client.js.JsCache;
@@ -284,6 +286,9 @@ public class GQuery implements Lazy<GQuery, LazyGQuery> {
       }
       if (JsUtils.isElement(o)) {
         return $(JsUtils.<Element> cast(o));
+      }
+      if (o instanceof JsonBuilder) {
+        return new GQuery(((JsonBuilder) o).getDataImpl());
       }
       if (o instanceof JavaScriptObject) {
         return $((JavaScriptObject) o);
