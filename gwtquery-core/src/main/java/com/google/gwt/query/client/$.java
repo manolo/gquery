@@ -232,7 +232,6 @@ public abstract class $ implements IsReturnFunction {
     return Deferred.when(toFnc(a), toFnc(b), toFnc(c), toFnc(d));
   }
 
-
   /**
    * A constructor function that returns a chainable utility object with methods to register
    * multiple callbacks into callback queues, invoke callback queues, and relay the success
@@ -241,18 +240,12 @@ public abstract class $ implements IsReturnFunction {
   public static Promise.Deferred Deferred() {
     return new Deferred();
   }
+  
+  public final boolean FALSE = Boolean.FALSE;
+  public final boolean TRUE = Boolean.TRUE;
+  public final Object NULL = null;
 
   public Object call() {
     return asGq().promise();
-  }
-
-  public boolean True() {
-    return true;
-  }
-  public boolean False() {
-    return false;
-  }
-  public boolean Null() {
-    return false;
   }
 }
