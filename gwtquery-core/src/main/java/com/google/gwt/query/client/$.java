@@ -50,7 +50,7 @@ public abstract class $ implements IsReturnFunction {
   public static Function toFnc(IsReturnFunction1 fnc) {
     return new Function() {
       public Object f(Object... args) {
-        return fnc.call(args[0]);
+        return fnc.call(arguments(0));
       }
     };
   }
@@ -62,24 +62,24 @@ public abstract class $ implements IsReturnFunction {
     };
   }
   public static Function toFnc(IsVoidFunction1 fnc) {
-    return fnc instanceof Function ? (Function) fnc : new Function() {
-      public  Object f(Object[] args) {
+    return fnc == null || fnc instanceof Function ? (Function) fnc : new Function() {
+      public  Object f(Object... args) {
         fnc.run(arguments(0));
         return null;
       };
     };
   }
   public static Function toFnc(IsVoidFunction2 fnc) {
-    return fnc instanceof Function ? (Function) fnc : new Function() {
-      public  Object f(Object[] args) {
+    return fnc == null || fnc instanceof Function ? (Function) fnc : new Function() {
+      public  Object f(Object... args) {
         fnc.run(arguments(0), arguments(1));
         return null;
       };
     };
   }
   public static Function toFnc(IsReturnFunction fnc) {
-    return fnc instanceof Function ? (Function) fnc : new Function() {
-      public  Object f(Object[] args) {
+    return fnc == null || fnc instanceof Function ? (Function) fnc : new Function() {
+      public  Object f(Object... args) {
         return fnc.call();
       };
     };
@@ -240,12 +240,23 @@ public abstract class $ implements IsReturnFunction {
   public static Promise.Deferred Deferred() {
     return new Deferred();
   }
-  
+
   public final boolean FALSE = Boolean.FALSE;
   public final boolean TRUE = Boolean.TRUE;
   public final Object NULL = null;
 
+  @Override
   public Object call() {
-    return asGq().promise();
+    console.log("CALLLL " + this.toString());
+    Promise p = asGq().promise();
+    return p;
+  }
+
+  // FIXME: this is needed because it seems that default functions in functional interfaces
+  // are not well supported in GWT yet
+  @Override
+  public Object call(Object o) {
+    console.log("Calling");
+    return call();
   }
 }

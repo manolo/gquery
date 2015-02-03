@@ -15,6 +15,7 @@
  */
 package com.google.gwt.query.client.plugins.deferred;
 
+import static com.google.gwt.query.client.GQuery.console;
 import static com.google.gwt.query.client.Promise.PENDING;
 import static com.google.gwt.query.client.Promise.REJECTED;
 import static com.google.gwt.query.client.Promise.RESOLVED;
@@ -65,7 +66,9 @@ public class Deferred implements Promise.Deferred {
         if (filter != null) {
           // We filter resolved arguments with the filter function
           Object newArgs = filter.setArguments(oldArgs).f(oldArgs);
-
+          if (newArgs instanceof GQuery) {
+            newArgs = ((GQuery)newArgs).promise();
+          }
           if (newArgs instanceof Promise) {
             // If filter function returns a promise we pipeline it.
             final Promise p = (Promise) newArgs;
@@ -246,32 +249,28 @@ public class Deferred implements Promise.Deferred {
 
     @Override
     public Object call(Object t) {
-      // TODO Auto-generated method stub
-      return null;
+      return call(t, null);
     }
 
     @Override
     public Object call(Object t, Object u) {
-      // TODO Auto-generated method stub
-      return null;
+      return call(t, u, null);
     }
 
     @Override
     public Object call(Object t, Object u, Object v) {
-      // TODO Auto-generated method stub
-      return null;
+      return call(t, u, v, null);
     }
 
     @Override
     public Object call(Object t, Object u, Object v, Object w) {
-      // TODO Auto-generated method stub
-      return null;
+      return call(t, u, v, w, null);
     }
 
     @Override
     public Object call(Object t, Object u, Object v, Object w, Object x) {
-      // TODO Auto-generated method stub
-      return null;
+      // FIXME: implement this
+      return call();
     }
   }
 
